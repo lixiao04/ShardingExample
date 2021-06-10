@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysqldepart.sharding.shardingdemo.mapper.OrderMapper">
+    <!--namespace根据自己需要创建的的mapper的路径和名称填写-->
+    <resultMap id="orderMap" type="com.mysqldepart.sharding.shardingdemo.entity.Order">
+        <result property="orderId" column="order_id" javaType="java.lang.Long"/>
+        <result property="userId" column="user_id" javaType="java.lang.Long"/>
+        <result property="price" column="price" javaType="java.math.BigDecimal"/>
+        <result property="status" column="status" javaType="java.lang.String"/>
+        <result property="createTime" column="create_time" javaType="java.lang.Long"/>
+    </resultMap>
+
+    <resultMap id="userorderMap" type="com.mysqldepart.sharding.shardingdemo.vo.UserOrderVO">
+        <result property="orderId" column="order_id" javaType="java.lang.Long"/>
+        <result property="username" column="username" javaType="java.lang.String"/>
+        <result property="gender" column="gender" javaType="java.lang.String"/>
+        <result property="age" column="age" javaType="java.lang.Integer"/>
+        <result property="price" column="price" javaType="java.math.BigDecimal"/>
+        <result property="status" column="status" javaType="java.lang.String"/>
+        <result property="orderTime" column="create_time" javaType="java.lang.Long"/>
+    </resultMap>
+
+    <sql id="condition">
+        <if test="order.orderId !=null and  order.orderId !=0l ">
+            and t_order.order_id =#{order.orderId}
+        </if>
+        <if test="order.userId !=null and  order.userId !=0l ">
+            and t_order.user_id =#{order.userId}
+        </if>
+        <if test="order.price !=null and  order.price !='' ">
+            and t_order.price =#{order.price}
+        </if>
+        <if test="order.status !=null and  order.status !='' ">
+            and t_order.status =#{order.status}
+        </if>
+        <if test="order.createTime !=null  and  order.createTime !=0l ">
+            and t_order.create_time =#{order.createTime}
+        </if>
+
+    </sql>
+
+    <select id="getOrder" resultMap="orderMap">
+        select * from t_order where 1=1
+       <include refid="condition"/>
+    </select>
+    <select id="getUserOrder" resultMap="userorderMap">
+
+        select u.username,u.gender ,u.age,t.order_id,t.price,t.create_time
+            from t_order t
+        left join t_user u on t.user_id=u.user_id
+    where t.user_id=#{userId}
+
+
+    </select>
+
+</mapper>
